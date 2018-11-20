@@ -18,7 +18,7 @@ spec:
         - -server
         - -printtoconsole
         - -debug=rpc
-        - -externalip=35.231.213.24
+        - -externalip=35.227.112.228
         - -txindex
         - -rpcbind=0.0.0.0:8332
         - -rpcallowip=0.0.0.0/0

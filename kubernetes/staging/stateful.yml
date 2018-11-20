@@ -19,7 +19,7 @@ spec:
         - -testnet
         - -printtoconsole
         - -debug=rpc
-        - -externalip=35.243.245.49
+        - -externalip=35.229.29.176
         - -txindex
         - -rpcbind=0.0.0.0:18332
         - -rpcallowip=0.0.0.0/0
