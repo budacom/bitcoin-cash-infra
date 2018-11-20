@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - args:
-        - bitcoin
+        - bitcoind
         - -server
         - -printtoconsole
         - -debug=rpc
