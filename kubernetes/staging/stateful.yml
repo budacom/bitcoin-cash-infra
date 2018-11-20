@@ -1,0 +1,63 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  labels:
+    app: bitcoin-cash
+  name: bitcoin-cash
+spec:
+  replicas: 1
+  serviceName: bitcoin-cash
+  template:
+    metadata:
+      labels:
+        app: bitcoin-cash
+    spec:
+      containers:
+      - args:
+        - bitcoin-cash
+        - -server
+        - -testnet
+        - -printtoconsole
+        - -debug=rpc
+        - -externalip=35.243.245.49
+        - -txindex
+        - -rpcbind=0.0.0.0:18332
+        - -rpcallowip=0.0.0.0/0
+        env:
+        - name: BITCOIN_RPC_PASSWORD
+          value: password
+        - name: BITCOIN_RPC_USER
+          value: bitcoin
+        image: us.gcr.io/ops-support-191021/bitcoin-cash:v0.18.0
+        imagePullPolicy: Always
+        name: bitcoin-cash
+        ports:
+        - containerPort: 18332
+          name: listener
+          protocol: TCP
+        - containerPort: 18333
+          name: rpc
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 7000Mi
+          requests:
+            cpu: 100m
+            memory: 6500Mi
+        volumeMounts:
+        - mountPath: /data
+          name: storage
+      terminationGracePeriodSeconds: 60
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: storage
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 50Gi
+      storageClassName: standard

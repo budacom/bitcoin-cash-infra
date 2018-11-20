@@ -1,0 +1,84 @@
+pipeline:
+  deploy:
+    when: &when
+      event: push
+      branch: release/*
+    image: us.gcr.io/ops-support-191021/hub:latest
+    pull: true
+    secrets: [ gcloud_service_key_prod ]
+    environment:
+      - CLUSTER=apps-prod
+      - ZONE=us-east1-b
+      - GCLOUD_SERVICE_KEY_PATH=/tmp/service_account_key.json
+    commands:
+      # Setup kubectl
+      - echo $GCLOUD_SERVICE_KEY_PROD | base64 --decode > $GCLOUD_SERVICE_KEY_PATH
+      - SERVICE_ACCOUNT=`cat $GCLOUD_SERVICE_KEY_PATH | jq -r '.client_email'`
+      - PROJECT_ID=`cat $GCLOUD_SERVICE_KEY_PATH | jq -r '.project_id'`
+      - gcloud auth activate-service-account $$SERVICE_ACCOUNT --key-file $GCLOUD_SERVICE_KEY_PATH
+      - gcloud container clusters get-credentials "$CLUSTER"
+          --project "$$PROJECT_ID"
+          --zone "$ZONE"
+
+      # Deploy staging
+      - REPO_NAME=${CI_REPO##budacom\/}
+      - PROJECT_NAME=$${REPO_NAME%%-infra}
+      - NAMESPACE=$${PROJECT_NAME}-staging
+      - kubectl create namespace $${NAMESPACE} || echo all good
+      - kubectl apply --namespace $${NAMESPACE} -f kubernetes/staging
+
+  propose-production:
+    when:
+      <<: *when
+    image: us.gcr.io/ops-support-191021/hub:latest
+    pull: true
+    secrets: [ hub_config ]
+    environment:
+      - HUB_CONFIG_PATH=/root/.config/hub
+    commands:
+      # Set hub and git
+      - echo $HUB_CONFIG | base64 --decode > $HUB_CONFIG_PATH
+      - hub config --global credential.https://github.com.helper /usr/local/bin/hub-credential-helper
+      - hub config --global user.email "cicd@budadev.com"
+      - hub config --global user.name "Drone CD"
+      - unset HUB_CONFIG
+
+      # Prepare Production PR
+      - REPO_NAME=${CI_REPO##budacom\/}
+      - PROJECT_NAME=$${REPO_NAME%%-infra}
+
+      - |
+        hub pull-request -h budacom:${CI_COMMIT_BRANCH} -b budacom:master -F- <<EOF || echo "PR Already exists"
+        release ${CI_COMMIT_BRANCH##release\/}
+
+        Updates container image to: $${PROJECT_NAME}
+        Build ID: ${CI_BUILD_NUMBER}
+        EOF
+
+  deploy_production:
+    when:
+      event: push
+      branch: master
+    image: us.gcr.io/ops-support-191021/hub:latest
+    pull: true
+    secrets: [ gcloud_service_key_prod ]
+    environment:
+      - CLUSTER=apps-prod
+      - ZONE=us-east1-b
+      - GCLOUD_SERVICE_KEY_PATH=/tmp/service_account_key.json
+    commands:
+      # Setup kubectl
+      - echo $GCLOUD_SERVICE_KEY_PROD | base64 --decode > $GCLOUD_SERVICE_KEY_PATH
+      - SERVICE_ACCOUNT=`cat $GCLOUD_SERVICE_KEY_PATH_PROD | jq -r '.client_email'`
+      - PROJECT_ID=`cat $GCLOUD_SERVICE_KEY_PATH | jq -r '.project_id'`
+      - gcloud auth activate-service-account $$SERVICE_ACCOUNT --key-file $GCLOUD_SERVICE_KEY_PATH
+      - gcloud container clusters get-credentials "$CLUSTER"
+          --project "$$PROJECT_ID"
+          --zone "$ZONE"
+
+      # Deploy Production
+      - REPO_NAME=${CI_REPO##budacom\/}
+      - PROJECT_NAME=$${REPO_NAME%%-infra}
+      - NAMESPACE=$${PROJECT_NAME}-prod
+      - kubectl create namespace $${NAMESPACE} || echo all good
+      - kubectl apply --namespace $${NAMESPACE} -f kubernetes/prod

@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: bitcoin-cash
+spec:
+  selector:
+    app: bitcoin-cash
+  ports:
+    - protocol: TCP
+      port: 18333
+      targetPort: 18333
+      name: listener
+  type: LoadBalancer

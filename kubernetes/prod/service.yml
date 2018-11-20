@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: bitcoin-cash-rpc
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
+spec:
+  selector:
+    app: bitcoin-cash
+  ports:
+    - protocol: TCP
+      port: 8332
+      targetPort: 8332
+      name: rpc
+  type: LoadBalancer
