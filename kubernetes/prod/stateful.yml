@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - args:
-        - bitcoin-cash
+        - bitcoin
         - -server
         - -printtoconsole
         - -debug=rpc
