@@ -9,8 +9,12 @@ spec:
   serviceName: bitcoin-cash
   template:
     metadata:
+      annotations:
+        prometheus.io/port: "9113"
+        prometheus.io/scrape: "true"
       labels:
         app: bitcoin-cash
+        net: mainnet
     spec:
       containers:
       - args:
@@ -20,7 +24,11 @@ spec:
         - -debug=rpc
         - -externalip=35.227.112.228
         - -txindex
-        - -rpcbind=0.0.0.0:8332
+        - -datadir=/data
+        - -rpcuser=$BITCOIN_RPC_USER
+        - -rpcpassword=$BITCOIN_RPC_PASSWORD
+        - -rpcport=8332
+        - -rpcbind=0.0.0.0
         - -rpcallowip=0.0.0.0/0
         env:
         - name: BITCOIN_RPC_PASSWORD
@@ -47,6 +55,24 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: storage
+      - args:
+        - -namespace=bch
+        - -rpc.user=bitcoin
+        - -rpc.pass=password
+        - -rpc.host=127.0.0.1:8332
+        image: platanus/bitcoin-prometheus-exporter:0.2.0
+        name: bitcoin-prometheus-exporter
+        ports:
+        - containerPort: 9113
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 300m
+            memory: 350Mi
+          requests:
+            cpu: 20m
+            memory: 250Mi
       terminationGracePeriodSeconds: 60
   updateStrategy:
     type: RollingUpdate
