@@ -14,7 +14,7 @@ spec:
         prometheus.io/scrape: "true"
       labels:
         app: bitcoin-cash
-        net: testnet
+        network: testnet
         blockchain: bitcoin-cash-abc
     spec:
       containers:
