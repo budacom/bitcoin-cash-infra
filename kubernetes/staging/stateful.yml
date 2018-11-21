@@ -15,6 +15,7 @@ spec:
       labels:
         app: bitcoin-cash
         net: testnet
+        blockchain: bitcoin-cash-abc
     spec:
       containers:
       - args:
@@ -57,7 +58,7 @@ spec:
         - mountPath: /data
           name: storage
       - args:
-        - -namespace=bch
+        - -namespace=bitcoin
         - -rpc.user=bitcoin
         - -rpc.pass=password
         - -rpc.host=127.0.0.1:18332
