@@ -5,7 +5,7 @@ metadata:
     app: bitcoin-cash
   name: bitcoin-cash
 spec:
-  replicas: 1
+  replicas: 2
   serviceName: bitcoin-cash
   template:
     metadata:
@@ -70,10 +70,10 @@ spec:
         resources:
           limits:
             cpu: 300m
-            memory: 350Mi
+            memory: 10Gi
           requests:
             cpu: 20m
-            memory: 250Mi
+            memory: 6.9Gi
       terminationGracePeriodSeconds: 60
   updateStrategy:
     type: RollingUpdate
@@ -85,5 +85,5 @@ spec:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 50Gi
+          storage: 250Gi
       storageClassName: standard
