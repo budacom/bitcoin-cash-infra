@@ -27,16 +27,17 @@ spec:
         - -externalip=35.229.29.176
         - -txindex
         - -datadir=/data
-        - -rpcuser=bitcoin
-        - -rpcpassword=password
+        - -rpcuser=$(BITCOIN_RPC_USER)
+        - -rpcpassword=$(BITCOIN_RPC_PASSWORD)
         - -rpcport=18332
         - -rpcbind=0.0.0.0
         - -rpcallowip=0.0.0.0/0
+        envFrom:
+          - secretRef:
+              name: node-credentials
         env:
-        - name: BITCOIN_RPC_PASSWORD
-          value: password
-        - name: BITCOIN_RPC_USER
-          value: bitcoin
+        - name: BITCOIN_ABC_DATA
+          value: /data/testnet3
         image: us.gcr.io/ops-support-191021/bitcoin-cash:v0.18.0
         imagePullPolicy: Always
         name: bitcoin-cash
@@ -59,9 +60,12 @@ spec:
           name: storage
       - args:
         - -namespace=bitcoin
-        - -rpc.user=bitcoin
-        - -rpc.pass=password
+        - -rpc.user=$(BITCOIN_RPC_USER)
+        - -rpc.pass=$(BITCOIN_RPC_PASSWORD)
         - -rpc.host=127.0.0.1:18332
+        envFrom:
+          - secretRef:
+              name: node-credentials
         image: platanus/bitcoin-prometheus-exporter:0.2.0
         name: bitcoin-prometheus-exporter
         ports:
