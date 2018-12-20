@@ -49,10 +49,10 @@ spec:
           protocol: TCP
         resources:
           limits:
-            cpu: 1200m
+            cpu: 1000m
             memory: 7000Mi
           requests:
-            cpu: 1000m
+            cpu: 100m
             memory: 6500Mi
         volumeMounts:
         - mountPath: /data
@@ -74,10 +74,10 @@ spec:
         resources:
           limits:
             cpu: 50m
-            memory: 20Mi
+            memory: 150Mi
           requests:
             cpu: 20m
-            memory: 10Mi
+            memory: 30Mi
       terminationGracePeriodSeconds: 60
   updateStrategy:
     type: RollingUpdate
