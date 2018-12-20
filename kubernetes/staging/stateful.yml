@@ -75,10 +75,10 @@ spec:
         resources:
           limits:
             cpu: 50m
-            memory: 20Mi
+            memory: 150Mi
           requests:
             cpu: 20m
-            memory: 10Mi
+            memory: 30Mi
       terminationGracePeriodSeconds: 60
   updateStrategy:
     type: RollingUpdate
