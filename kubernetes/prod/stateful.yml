@@ -37,7 +37,7 @@ spec:
         env:
         - name: BITCOIN_ABC_DATA
           value: /data/mainnet
-        image: us.gcr.io/ops-support-191021/bitcoin-cash:v0.19.5
+        image: us.gcr.io/ops-support-191021/bitcoin-cash:v0.20.6
         imagePullPolicy: Always
         name: bitcoin-cash
         ports:
