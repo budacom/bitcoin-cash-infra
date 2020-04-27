@@ -50,10 +50,10 @@ spec:
         resources:
           limits:
             cpu: 1000m
-            memory: 7000Mi
+            memory: 3200Mi
           requests:
             cpu: 100m
-            memory: 6500Mi
+            memory: 2700Mi
         volumeMounts:
         - mountPath: /data
           name: storage
